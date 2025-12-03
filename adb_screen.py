@@ -74,7 +74,7 @@ def index():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADB Screen Mirror & Control(1.0)</title>
+    <title>ADB Screen Mirror & Control(1.0.1)</title>
     <style>
         * {
             margin: 0;
@@ -313,6 +313,31 @@ def index():
             <div class="control-group">
                 <button id="testBtn" class="btn-primary">🔍 Test ADB Connection</button>
             </div>
+
+            <div class="control-group">
+    <button class="btn-primary" onclick="sendKey('3')">🏠 Home</button>
+</div>
+
+<div class="control-group">
+    <button class="btn-primary" onclick="sendKey('4')">🔙 Back</button>
+</div>
+
+<div class="control-group">
+    <button class="btn-primary" onclick="sendKey('24')">🔊 Volume +</button>
+</div>
+
+<div class="control-group">
+    <button class="btn-primary" onclick="sendKey('25')">🔉 Volume -</button>
+</div>
+
+<div class="control-group">
+    <button class="btn-primary" onclick="sendKey('26')">⏻ Power</button>
+</div>
+
+<div class="control-group">
+    <button class="btn-primary" onclick="sendKey('187')">📑 Recents</button>
+</div>
+
         </div>
 
         <div class="screen-container">
@@ -351,6 +376,28 @@ def index():
     </div>
 
     <script>
+        async function sendKey(keycode) {
+    try {
+        const res = await fetch('/key', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: keycode })
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            updateStatus(`Key failed: ${data.error}`, 'error');
+        } else {
+            updateStatus(`Key sent (code ${keycode})`, 'success');
+        }
+
+    } catch (err) {
+        updateStatus(`Error: ${err.message}`, 'error');
+    }
+}
+
+
         let intervalId = null;
         let frameCount = 0;
         let tapCount = 0;
@@ -747,6 +794,24 @@ def swipe():
         return jsonify({"success": True})
     else:
         return jsonify({"success": False, "error": error})
+
+@app.route('/key', methods=['POST'])
+def send_key():
+    """Send a keyevent to Android"""
+    data = request.json
+    key = data.get('key')
+
+    if key is None:
+        return jsonify({"success": False, "error": "Missing key"})
+
+    # ADB: adb shell input keyevent <KEYCODE>
+    success, _, error = run_adb_command(f"adb shell input keyevent {key}")
+
+    if success:
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False, "error": error})
+
 
 if __name__ == '__main__':
     print("=" * 60)
