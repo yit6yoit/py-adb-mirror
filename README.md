@@ -9,7 +9,8 @@ from the web interface.
 > **Note:** This project is **mostly AI-generated** and has been
 > **tested on a cheap 4G Android 4.4 device** on **EndeavourOS**.\
 > Performance depends heavily on device speed and USB connection
-> quality.
+> quality. Aso this the my first project and i dont know if i did
+> everything right.
 
 ------------------------------------------------------------------------
 
@@ -71,3 +72,5 @@ and swipes.
     expect lower fps.
 -   Verified working with an old Android 4.4 device.
 -   Ideal for debugging or simple remote control tasks.
+-   For now probably doesnt automatically work with wireless debugging.
+-   For me frame updating speed higher than 750ms doesnt work.
