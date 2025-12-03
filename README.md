@@ -7,10 +7,17 @@ It also supports **touch input**, including taps and swipes, directly
 from the web interface.
 
 > **Note:** This project is **mostly AI-generated** and has been
-> **tested on a cheap 4G Android 4.4 device** on **EndeavourOS**.\
-> Performance depends heavily on device speed and USB connection
-> quality. Aso this the my first project and i dont know if i did
-> everything right.
+  **tested on a cheap 4G Android 4.4 device** on **EndeavourOS**.\
+> Performance depends heavily on device speed and USB connection quality.
+> Aso this the my first project and i dont know if i did
+  everything right.
+
+------------------------------------------------------------------------
+
+## **Tested On**
+
+- **A cheap 4G adapter, Android 4.4.4** – worked good
+- **Samsung Galaxy A55, Android 16** – worked, but not the best
 
 ------------------------------------------------------------------------
 
