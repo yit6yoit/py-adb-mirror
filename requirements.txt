@@ -1,0 +1,8 @@
+Python libraries:
+flask
+flask-cors
+pillow
+
+Other things needed:
+adb (in path)
+debugging enabled on the phone and authorized with the pc
