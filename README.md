@@ -64,6 +64,10 @@ python main.py
 You should see your device's screen and be able to interact through taps
 and swipes.
 
+Taps with left mouse button.
+Swipes hold right mouse button start swiping release right button and 
+it should then do the swipe.
+
 ------------------------------------------------------------------------
 
 ## **Notes**
