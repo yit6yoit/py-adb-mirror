@@ -1,4 +1,5 @@
 """
+1.0.1
 ADB Screen Mirror & Control - Python Backend Server
 This script runs a local web server that executes ADB commands and serves a web interface.
 
@@ -44,21 +45,39 @@ def run_adb_command(command):
         return False, "", str(e)
 
 def capture_screenshot():
-    """Capture screenshot from Android device"""
+    """Capture screenshot from Android device, return image bytes in memory"""
     # Take screenshot on device
     success, _, error = run_adb_command(f"adb shell screencap -p {SCREENSHOT_PATH}")
     if not success:
         return False, f"Failed to capture screenshot: {error}"
 
-    # Pull screenshot to computer
-    success, _, error = run_adb_command(f"adb pull {SCREENSHOT_PATH} {LOCAL_SCREENSHOT}")
-    if not success:
-        return False, f"Failed to pull screenshot: {error}"
+    # Pull screenshot into memory via stdout (no temp file)
+    try:
+        result = subprocess.run(
+            f"adb pull {SCREENSHOT_PATH} -",
+            shell=True,
+            capture_output=True,
+            timeout=15
+        )
+        if result.returncode != 0:
+            # Fallback: pull to disk if stdout pull isn't supported
+            success, _, error = run_adb_command(f"adb pull {SCREENSHOT_PATH} {LOCAL_SCREENSHOT}")
+            if not success:
+                return False, f"Failed to pull screenshot: {error}"
+            run_adb_command(f"adb shell rm {SCREENSHOT_PATH}")
+            with open(LOCAL_SCREENSHOT, "rb") as f:
+                img_bytes = f.read()
+            os.remove(LOCAL_SCREENSHOT)
+            return True, img_bytes
+
+        img_bytes = result.stdout
+    except subprocess.TimeoutExpired:
+        return False, "Pull timed out"
 
     # Delete screenshot from device
     run_adb_command(f"adb shell rm {SCREENSHOT_PATH}")
 
-    return True, LOCAL_SCREENSHOT
+    return True, img_bytes
 
 def send_tap(x, y):
     """Send tap command to device"""
@@ -442,12 +461,13 @@ def index():
         async function captureScreen() {
             const startTime = Date.now();
 
-            try {
-                const response = await fetch('/screenshot');
-                const data = await response.json();
+            return new Promise((resolve) => {
+                const ts = new Date().getTime();
+                const newSrc = '/screenshot?' + ts;
+                const img = new Image();
 
-                if (data.success) {
-                    screenImage.src = '/screen?' + new Date().getTime();
+                img.onload = () => {
+                    screenImage.src = newSrc;
                     screenImage.style.display = 'block';
                     placeholder.style.display = 'none';
                     frameCount++;
@@ -458,14 +478,18 @@ def index():
 
                     updateStats();
                     updateStatus(`Mirroring active - Last frame: ${latency}ms`, 'success');
-                } else {
-                    throw new Error(data.error);
-                }
-            } catch (error) {
-                errorCount++;
-                updateStats();
-                updateStatus(`Error: ${error.message}`, 'error');
-            }
+                    resolve();
+                };
+
+                img.onerror = () => {
+                    errorCount++;
+                    updateStats();
+                    updateStatus('Error: Failed to capture screenshot', 'error');
+                    resolve();
+                };
+
+                img.src = newSrc;
+            });
         }
 
         startBtn.addEventListener('click', async () => {
@@ -741,21 +765,17 @@ def test_connection():
 
 @app.route('/screenshot')
 def screenshot():
-    """Capture and return screenshot status"""
+    """Capture screenshot and return it directly as an image (atomic)"""
     success, result = capture_screenshot()
-
     if success:
-        return jsonify({"success": True})
+        return send_file(io.BytesIO(result), mimetype='image/png')
     else:
-        return jsonify({"success": False, "error": result})
+        return jsonify({"success": False, "error": result}), 500
 
 @app.route('/screen')
 def get_screen():
-    """Serve the screenshot image"""
-    if os.path.exists(LOCAL_SCREENSHOT):
-        return send_file(LOCAL_SCREENSHOT, mimetype='image/png')
-    else:
-        return jsonify({"error": "No screenshot available"}), 404
+    """Legacy endpoint: same as /screenshot"""
+    return screenshot()
 
 @app.route('/tap', methods=['POST'])
 def tap():
