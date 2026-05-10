@@ -84,4 +84,6 @@ it should then do the swipe.
 -   Verified working with an old Android 4.4 device.
 -   Ideal for debugging or simple remote control tasks.
 -   For now probably doesnt automatically work with wireless debugging.
--   For me frame updating speed higher than 750ms doesnt work.
+-   For me frame updating speed higher than 200ms doesnt work but the 
+    you go the more loaded the device bcomes and the higher the latency
+    gets.
