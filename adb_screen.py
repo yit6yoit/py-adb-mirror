@@ -1,5 +1,5 @@
 """
-1.1.0
+1.2.0
 ADB Screen Mirror & Control - Python Backend Server
 This script runs a local web server that executes ADB commands and serves a web interface.
 
@@ -280,7 +280,7 @@ HTML = r"""<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADB Screen Mirror & Control (1.1.0)</title>
+    <title>ADB Screen Mirror & Control (1.2.0)</title>
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -437,7 +437,7 @@ HTML = r"""<!DOCTYPE html>
 </head>
 <body>
 <div class="container">
-    <h1>ADB Screen Mirror &amp; Control <small style="font-size:14px;color:#999">1.1.0</small></h1>
+    <h1>ADB Screen Mirror &amp; Control <small style="font-size:14px;color:#999">1.2.0</small></h1>
     <p class="subtitle">Control your Android device · Python backend running</p>
 
     <div id="status" class="status info">Ready. Click "Start Mirroring" to begin.</div>
@@ -866,7 +866,7 @@ function clearSwipeViz() {
 
 if __name__ == '__main__':
     print("=" * 60)
-    print("🚀  ADB Screen Mirror & Control  v1.1.0")
+    print("🚀  ADB Screen Mirror & Control  v1.2.0")
     print("=" * 60)
     print("\n✅  Server starting…")
     print("📱  Make sure your Android device is connected via USB")
